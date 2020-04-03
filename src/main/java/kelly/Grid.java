@@ -1,6 +1,5 @@
 package kelly;
 
-import java.util.Arrays;
 import java.util.Random;
 
 public class Grid {
@@ -25,7 +24,8 @@ public class Grid {
     private int rows;
     private int columns;
     private boolean gameOver = false;
-    private static final Random random = new Random();
+    private boolean packing = false;
+    private final Random random = new Random();
 
     public Grid(int rows, int columns) {
         this.rows = rows;
@@ -43,6 +43,10 @@ public class Grid {
 
     public boolean isGameOver() {
         return gameOver;
+    }
+
+    public boolean isPacking() {
+        return packing;
     }
 
     public int getRows() {
@@ -93,99 +97,135 @@ public class Grid {
         return -1;
     }
 
-    public int[] consolidate(Move move) {
-        int length = move.isVertical ? columns : rows;
-        int[] result = new int[cellValues.length];
-        for (int i = 0; i<length; i++) {
-            int[] data = move.isVertical ?
-                convertColumn(i, Move.UP.equals(move))
-                : convertRow(i, Move.LEFT.equals(move))
-                ;
-            int[] packed = packX(0, data);
-            if (move.isVertical()) {
-                putBackColumn(i, packed, Move.UP.equals(move));
-            } else {
-                putBackRow(i, packed, Move.LEFT.equals(move));
+    /**
+     * Packs the values with the given Move direction to eliminate spaces
+     * @param move - the direction of movement
+     * @return boolean - true if any cell value has changed
+     */
+    boolean pack0(Move move) {
+        boolean changed = false;
+        for (int r = 0; r < rows; r++) {
+            for (int c = 0; c < columns; c++) {
+                int v = valueAt(r, c);
+                if (v != 0) {
+                    continue;
+                }
+                int nx, nv;
+                switch (move) {
+                    case UP:
+                        nx = r + 1;
+                        if (nx < rows && (nv = valueAt(nx, c)) != 0) {
+                            putValue(r, c, nv);
+                            putValue(nx, c, 0);
+                            changed = true;
+                        }
+                        break;
+                    case DOWN:
+                        nx = r - 1;
+                        if (nx >= 0 && (nv = valueAt(nx, c)) != 0) {
+                            putValue(r, c, nv);
+                            putValue(nx , c, 0);
+                            changed = true;
+                        }
+                        break;
+                    case LEFT:
+                        nx = c + 1;
+                        if (nx < columns && (nv = valueAt(r, nx)) != 0) {
+                            putValue(r, c, nv);
+                            putValue(r, nx, 0);
+                            changed = true;
+                        }
+                        break;
+                    case RIGHT:
+                        nx = c - 1;
+                        if (nx >= 0 && (nv = valueAt(r, nx)) != 0) {
+                            putValue(r, c, nv);
+                            putValue(r, nx, 0);
+                            changed = true;
+                        }
+                        break;
+                }
+            }
+        }
+        return changed;
+    }
+
+//    boolean packXDetail(int rStart, int rEnd, int rInc, int cStart, int cEnd, int cInc, Move move) {
+//
+//    }
+
+    boolean packX(Move move) {
+        boolean changed = false;
+        for (int r = 0; r < rows; r++) {
+            for (int c = 0; c < columns; c++) {
+                int v = valueAt(r, c);
+                int nx;
+                switch (move) {
+                    case UP:
+                        nx = r + 1;
+                        if (nx < rows && v == valueAt(nx, c)) {
+                            putValue(r, c, v * 2);
+                            putValue(nx, c, 0);
+                            changed = true;
+                        }
+                        break;
+                    case DOWN:
+                        nx = r - 1;
+                        if (nx >= 0 && v == valueAt(nx, c)) {
+                            putValue(r, c, v * 2);
+                            putValue(nx, c, 0);
+                            changed = true;
+                        }
+                        break;
+                    case LEFT:
+                        nx = c + 1;
+                        if (nx < columns && v == valueAt(r, nx)) {
+                            putValue(r, c, v * 2);
+                            putValue(r, nx, 0);
+                            changed = true;
+                        }
+                        break;
+                    case RIGHT:
+                        nx = c - 1;
+                        if (nx >= 0 && v == valueAt(r, nx)) {
+                            putValue(r, c, v * 2);
+                            putValue(r, nx, 0);
+                            changed = true;
+                        }
+                        break;
+                }
             }
         }
 
-        for(int i = 0; i< this.cellValues.length; i++) {
-            result[i] = valueAt(i);
-        }
-
-        return result;
-    }
-
-    private void putBackColumn(int column, int[] data, boolean shiftUp) {
-        for(int idx = 0; idx < data.length; idx++) {
-            int tileRow = shiftUp ? idx : rows - idx - 1;
-            putValue(tileRow, column, data[idx]);
-        }
-    }
-
-    private void putBackRow(int row, int[] data, boolean shiftLeft) {
-        for(int idx = 0; idx < data.length; idx++) {
-            int tileColumn = shiftLeft ? idx : columns - idx - 1;
-            putValue(row, tileColumn, data[idx]);
-        }
-    }
-
-    private int[] convertRow(int row, boolean shiftLeft) {
-        int[] result = new int[columns];
-        for (int idx = 0; idx < columns; idx++) {
-            int tileCol = shiftLeft ? idx : columns - idx - 1;
-            result[idx] = valueAt(row, tileCol);
-        }
-        return result;
-    }
-
-    private int[] convertColumn(int col, boolean shiftUp) {
-        int[] result = new int[rows];
-        for (int idx = 0; idx < rows; idx++) {
-            int tileRow = shiftUp ? idx : rows - idx - 1;
-            result[idx] = valueAt(tileRow, col);
-        }
-        return result;
-    }
-
-    static int[] pack0(int start, int[] data) {
-        for(int i=start; i<data.length - 1; i++) {
-            if (data[i] == 0) {
-                pack0(i+1, data);
-                data[i] = data[i+1];
-                data[i+1] = 0;
-            }
-        }
-        return data;
-    }
-
-    static int[] packX(int start, int data[]) {
-        for(int i=start; i<data.length - 1; i++) {
-            pack0(i, data);
-            if (data[i] == data[i+1]) {
-                data[i] = data[i+1] * 2;
-                data[i+1] = 0;
-            }
-        }
-        return data;
-    }
-
-    public int[] cloneValues() {
-        int[] result = new int[cellValues.length];
-        for(int i = 0; i< cellValues.length; i++) {
-            result[i] = valueAt(i);
-        }
-        return result;
+        return changed;
     }
 
     /**
      * Returns if anything thing was moved at all
-     * @param move
-     * @return
+     * @param move - direction of movement
+     * @return boolean - true if the grid was changed
      */
-    public boolean doMove(Move move) {
-        int[] original = cloneValues();
-        int[] shifted = consolidate(move);
-        return !Arrays.equals(original, shifted);
+    public boolean pack(Move move, long delay) {
+        this.packing = true;
+        boolean changed = false;
+
+        while(pack0(move)) {
+            changed = true;
+            AnimationManager.safeSleep(delay);
+        }
+
+        if (packX(move)) {
+            changed = true;
+            AnimationManager.safeSleep(delay);
+        }
+
+        while(pack0(move)) {
+            changed = true;
+            AnimationManager.safeSleep(delay);
+        }
+
+        this.packing = false;
+        return changed;
     }
+
 }

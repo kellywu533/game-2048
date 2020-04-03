@@ -1,12 +1,10 @@
 package kelly;
 
-import javax.sound.sampled.*;
 import java.awt.*;
 
 public class Canvas2048 extends Canvas {
     private int scale;
     private Grid grid;
-    private Clip clip;
 
     public Canvas2048(Grid grid, int scale) {
         this.scale = scale;

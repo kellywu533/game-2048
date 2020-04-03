@@ -3,7 +3,6 @@ package kelly;
 import javax.sound.sampled.*;
 import java.io.File;
 import java.io.IOException;
-import java.util.Date;
 
 // To play sound using Clip, the process need to be alive.
 // Hence, we use a Swing application.
@@ -12,6 +11,7 @@ public class SoundPlayer {
     public enum Type {
         MOVE("Ping.aiff")
         , ILLEGAL("Basso.aiff")
+        , CLICK("Bottle.aiff")
         ;
 
         File soundFile;

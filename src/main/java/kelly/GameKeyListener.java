@@ -6,6 +6,7 @@ import java.awt.event.KeyListener;
 public class GameKeyListener implements KeyListener {
     private Grid grid;
     private Canvas2048 canvas;
+    private static final long MOVE_DELAY = 50;
 
     public GameKeyListener(Grid grid, Canvas2048 canvas) {
         this.grid = grid;
@@ -22,6 +23,10 @@ public class GameKeyListener implements KeyListener {
 
     @Override
     public void keyReleased(KeyEvent e) {
+        if (grid.isPacking()) {
+            return;
+        }
+
         Grid.Move move = null;
         switch(e.getKeyCode()) {
             case KeyEvent.VK_UP :
@@ -44,7 +49,27 @@ public class GameKeyListener implements KeyListener {
         }
 
         if (move != null) {
-            if(grid.doMove(move)) {
+            Thread t = doMove(move);
+            t.start();
+        }
+    }
+
+    private Thread doMove(final Grid.Move move) {
+        return new Thread(() -> {
+            Thread t  = new Thread() {
+                @Override
+                public void run() {
+                    do {
+                        canvas.repaint();
+                        AnimationManager.safeSleep(MOVE_DELAY);
+                    } while(grid.isPacking());
+                    canvas.repaint();
+                }
+            };
+            t.start();
+
+            SoundPlayer.playSound(SoundPlayer.Type.CLICK);
+            if(grid.pack(move, MOVE_DELAY)) {
                 SoundPlayer.playSound(SoundPlayer.Type.MOVE);
                 if(grid.addRandomValue() < 0) {
                     System.out.println("Game Over!");
@@ -56,6 +81,6 @@ public class GameKeyListener implements KeyListener {
                 SoundPlayer.playSound(SoundPlayer.Type.ILLEGAL);
                 System.out.println("Illegal action - " + move);
             }
-        }
+        });
     }
 }
