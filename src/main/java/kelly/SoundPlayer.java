@@ -12,6 +12,7 @@ public class SoundPlayer {
         MOVE("Ping.aiff")
         , ILLEGAL("Basso.aiff")
         , CLICK("Bottle.aiff")
+        , GAME_OVER("Sosumi.aiff")
         ;
 
         File soundFile;
@@ -24,11 +25,33 @@ public class SoundPlayer {
         }
     }
 
-    private static Clip clip;
-
     public static void playSound(File f) {
         try (AudioInputStream ais = AudioSystem.getAudioInputStream(f)) {
-            clip = AudioSystem.getClip();
+            final Clip clip = AudioSystem.getClip();
+            clip.addLineListener(new LineListener() {
+                @Override
+                public void update(LineEvent event) {
+                    LineEvent.Type type = event.getType();
+                    if (type == LineEvent.Type.OPEN) {
+                        System.out.println("OPEN :"
+//                                + clip + " - " + ais
+                        );
+                    } else if (type == LineEvent.Type.CLOSE) {
+                        System.out.println("CLOSE:"
+//                                + clip + " - " + ais
+                        );
+                    } else if (type == LineEvent.Type.START) {
+                        System.out.println("START:"
+//                                + clip + " - " + ais
+                        );
+                    } else if (type == LineEvent.Type.STOP) {
+                        System.out.println("STOP :"
+//                                + clip + " - " + ais
+                        );
+                        clip.close();
+                    }
+                }
+            });
             clip.open(ais);
             clip.start();
         } catch (UnsupportedAudioFileException e) {
@@ -48,7 +71,7 @@ public class SoundPlayer {
         for(int i=0; i<10; i++) {
             System.out.println(i);
             playSound(Type.MOVE);
-            Thread.sleep(5);
+            Thread.sleep(150);
         }
     }
 }

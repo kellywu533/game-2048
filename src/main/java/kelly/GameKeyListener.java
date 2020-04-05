@@ -6,7 +6,7 @@ import java.awt.event.KeyListener;
 public class GameKeyListener implements KeyListener {
     private Grid grid;
     private Canvas2048 canvas;
-    private static final long MOVE_DELAY = 50;
+    private static final long MOVE_DELAY = 75;
 
     public GameKeyListener(Grid grid, Canvas2048 canvas) {
         this.grid = grid;
@@ -48,6 +48,10 @@ public class GameKeyListener implements KeyListener {
                 break;
         }
 
+        if (verifyGameOver()) {
+            return;
+        }
+
         if (move != null) {
             Thread t = doMove(move);
             t.start();
@@ -56,31 +60,43 @@ public class GameKeyListener implements KeyListener {
 
     private Thread doMove(final Grid.Move move) {
         return new Thread(() -> {
-            Thread t  = new Thread() {
-                @Override
-                public void run() {
-                    do {
-                        canvas.repaint();
-                        AnimationManager.safeSleep(MOVE_DELAY);
-                    } while(grid.isPacking());
-                    canvas.repaint();
-                }
-            };
-            t.start();
+//            Thread t  = new Thread() {
+//                @Override
+//                public void run() {
+//                    do {
+//                        canvas.repaint();
+//                        AnimationManager.safeSleep(MOVE_DELAY);
+//                    } while(grid.isPacking());
+//                    canvas.repaint();
+//                }
+//            };
+//            t.start();
 
             SoundPlayer.playSound(SoundPlayer.Type.CLICK);
             if(grid.pack(move, MOVE_DELAY)) {
+                System.out.println("Moving " + move + " free: " + grid.freeCells());
                 SoundPlayer.playSound(SoundPlayer.Type.MOVE);
-                if(grid.addRandomValue() < 0) {
-                    System.out.println("Game Over!");
-                } else {
-                    System.out.println("Moving " + move);
-                    canvas.repaint();
-                }
+                AnimationManager.safeSleep(MOVE_DELAY);
+                grid.addRandomValue();
+//                canvas.repaint();
             } else {
                 SoundPlayer.playSound(SoundPlayer.Type.ILLEGAL);
                 System.out.println("Illegal action - " + move);
             }
+
+            verifyGameOver();
+
         });
+    }
+
+    private boolean verifyGameOver() {
+        if (grid.checkGameOver()) {
+            System.out.println("Game Over!");
+            SoundPlayer.playSound(SoundPlayer.Type.GAME_OVER);
+            return true;
+        }
+
+        return false;
+
     }
 }

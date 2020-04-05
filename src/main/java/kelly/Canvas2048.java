@@ -2,17 +2,24 @@ package kelly;
 
 import java.awt.*;
 
-public class Canvas2048 extends Canvas {
+public class Canvas2048 extends Canvas implements GridEventListener {
     private int scale;
     private Grid grid;
+    private GameTile[] gameTiles;
 
     public Canvas2048(Grid grid, int scale) {
         this.scale = scale;
         this.grid = grid;
+        this.gameTiles = GameTile.gameTiles();
     }
 
-    public Dimension getPreferredDimension() {
+    @Override
+    public void update(GridEvent event) {
+        this.repaint();
+    }
 
+    @Override
+    public Dimension getPreferredSize() {
         return new Dimension(grid.getColumns()*scale, grid.getRows()*scale);
     }
 
@@ -20,9 +27,13 @@ public class Canvas2048 extends Canvas {
         if(val == 0) {
             return;
         }
-        int x = col * scale + scale/2;
-        int y = row * scale + scale/2;
-        g.drawString(Integer.toString(val), x, y);
+        int x = col * scale;
+        int y = row * scale;
+        GameTile t = gameTiles[val];
+        g.setColor(t.getColor());
+        g.fillRect(x + 2, y + 2, scale - 4, scale - 4);
+        g.setColor(Color.BLACK);
+        g.drawString(t.getDisplayText() , x + scale/2, y + scale/2);
     }
 
     @Override
@@ -30,7 +41,7 @@ public class Canvas2048 extends Canvas {
         int columns = grid.getColumns();
         int rows = grid.getRows();
 
-        setBackground(Color.WHITE);
+//        setBackground(Color.WHITE);
 
         g.setColor(Color.BLACK);
         int length = columns * scale;
