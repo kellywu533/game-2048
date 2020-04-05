@@ -23,17 +23,12 @@ public class Canvas2048 extends Canvas implements GridEventListener {
         return new Dimension(grid.getColumns()*scale, grid.getRows()*scale);
     }
 
+    private static final int OFFSET = 3;
     private void drawTile(Graphics g, int row, int col, int val) {
-        if(val == 0) {
-            return;
-        }
-        int x = col * scale;
-        int y = row * scale;
+        int x = col * scale + OFFSET;
+        int y = row * scale + OFFSET;
         GameTile t = gameTiles[val];
-        g.setColor(t.getColor());
-        g.fillRect(x + 2, y + 2, scale - 4, scale - 4);
-        g.setColor(Color.BLACK);
-        g.drawString(t.getDisplayText() , x + scale/2, y + scale/2);
+        g.drawImage(t.drawTile(scale, OFFSET, getBackground()), x, y,this);
     }
 
     @Override
@@ -41,17 +36,8 @@ public class Canvas2048 extends Canvas implements GridEventListener {
         int columns = grid.getColumns();
         int rows = grid.getRows();
 
-//        setBackground(Color.WHITE);
-
-        g.setColor(Color.BLACK);
-        int length = columns * scale;
-        int width = rows * scale;
-        for(int y=0; y<=rows; y++) {
-            g.drawLine(0, y*scale, length, y*scale);
-        }
-        for(int x=0; x<=columns; x++) {
-            g.drawLine(x*scale, 0, x*scale, width);
-        }
+//        g.setColor(getBackground());
+//        g.fillRect(0, 0, getWidth(), getHeight());
 
         for(int c=0; c<columns; c++) {
             for(int r=0; r<rows; r++) {

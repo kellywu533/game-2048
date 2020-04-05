@@ -6,7 +6,7 @@ import java.awt.event.KeyListener;
 public class GameKeyListener implements KeyListener {
     private Grid grid;
     private Canvas2048 canvas;
-    private static final long MOVE_DELAY = 75;
+    private static final long MOVE_DELAY = 20;
 
     public GameKeyListener(Grid grid, Canvas2048 canvas) {
         this.grid = grid;
