@@ -1,13 +1,13 @@
 package kelly;
 
 import javax.sound.sampled.*;
-import javax.swing.*;
-import java.awt.*;
-import java.io.File;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
-// To play sound using Clip, the process need to be alive.
-// Hence, we use a Swing application.
 public class SoundPlayer {
     private static final String AUDIO_DIR = "/System/Library/Sounds/";
     public enum Type {
@@ -17,22 +17,25 @@ public class SoundPlayer {
         , GAME_OVER("Sosumi.aiff")
         ;
 
-        File soundFile;
+        byte[] soundData;
         Type(String fname) {
-            this.soundFile = new File(AUDIO_DIR, fname);
+            try {
+                Path path = Paths.get(AUDIO_DIR, fname);
+                soundData = Files.readAllBytes(path);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
-        public File getSoundFile() {
-            return this.soundFile;
+        public InputStream soundDataInputStream() {
+            return new ByteArrayInputStream(soundData);
         }
     }
 
-    public static void playSound(File f) {
-        try (AudioInputStream ais = AudioSystem.getAudioInputStream(f)) {
+    public static void playSound(InputStream is) {
+        try (AudioInputStream ais = AudioSystem.getAudioInputStream(is)) {
             final Clip clip = AudioSystem.getClip();
-            clip.addLineListener(new LineListener() {
-                @Override
-                public void update(LineEvent event) {
+            clip.addLineListener((event) -> {
                     LineEvent.Type type = event.getType();
                     if (type == LineEvent.Type.OPEN) {
                         System.out.println("OPEN :"
@@ -52,7 +55,6 @@ public class SoundPlayer {
                         );
                         clip.close();
                     }
-                }
             });
             clip.open(ais);
             clip.start();
@@ -66,14 +68,14 @@ public class SoundPlayer {
     }
 
     public static void playSound(Type t) {
-        playSound(t.getSoundFile());
+        playSound(t.soundDataInputStream());
     }
 
     public static void main(String[] args) throws InterruptedException {
-//        for(int i=0; i<10; i++) {
-//            System.out.println(i);
-//            playSound(Type.MOVE);
-//            Thread.sleep(150);
-//        }
+        for(int i=0; i<10; i++) {
+            System.out.println(i);
+            playSound(Type.MOVE);
+            Thread.sleep(150);
+        }
     }
 }
