@@ -21,26 +21,15 @@ public class App
         Canvas2048 c = new Canvas2048(grid, SCALE);
         grid.addListener(c);
 
-        ScoreField sf = new ScoreField();
+        ScorePane sf = new ScorePane();
         grid.addListener(sf);
 
         GameKeyListener gkl = new GameKeyListener(grid, c);
         c.addKeyListener(gkl);
 
-//        jf.addKeyListener(gkl);
-
-//        JPanel jp = new JPanel();
-//        jf.add(jp);
-
-//        BorderLayout layout = new BorderLayout();
-//        layout.addLayoutComponent(c,BorderLayout.CENTER);
-//        layout.addLayoutComponent(sf, BorderLayout.NORTH);
-
-//        jp.setLayout(layout);
-
-//        jf.getContentPane().setLayout(layout);
-        jf.add(c);
-//        jf.getContentPane().setPreferredSize(c.getPreferredDimension());
+        jf.getContentPane().setLayout(new BorderLayout());
+        jf.add(c, BorderLayout.CENTER);
+        jf.add(sf, BorderLayout.NORTH);
 
         jf.pack();
         jf.setVisible(true);

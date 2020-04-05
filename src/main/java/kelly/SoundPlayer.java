@@ -1,6 +1,8 @@
 package kelly;
 
 import javax.sound.sampled.*;
+import javax.swing.*;
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 
@@ -68,10 +70,10 @@ public class SoundPlayer {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        for(int i=0; i<10; i++) {
-            System.out.println(i);
-            playSound(Type.MOVE);
-            Thread.sleep(150);
-        }
+//        for(int i=0; i<10; i++) {
+//            System.out.println(i);
+//            playSound(Type.MOVE);
+//            Thread.sleep(150);
+//        }
     }
 }
