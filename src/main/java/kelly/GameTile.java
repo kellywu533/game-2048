@@ -41,9 +41,8 @@ public class GameTile {
         return color;
     }
 
-    private static final String FONT_NAME = "Arial";
     private BufferedImage tileImage = null;
-    public BufferedImage drawTile(int scale, int offset, Color background) {
+    public BufferedImage drawTile(int scale, int offset, Color background, String fontName) {
         if(tileImage == null) {
             int length = scale - offset * 2;
 
@@ -68,7 +67,7 @@ public class GameTile {
                         : num < 1000 ? 32
                         : num < 1000 ? 24
                         : 18;
-                Font font = new Font(FONT_NAME, Font.BOLD, fontSize);
+                Font font = new Font(fontName, Font.BOLD, fontSize);
                 g.setFont(font);
                 String text = Integer.toString(num);
                 g.setColor(Color.DARK_GRAY);
