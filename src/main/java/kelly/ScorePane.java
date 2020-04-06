@@ -27,7 +27,11 @@ public class ScorePane extends JPanel implements GridEventListener {
 
     @Override
     public void update(GridEvent event) {
-        totalScore += event.getScore();
+        if(event.getScore() < 0) {
+            totalScore = 0;
+        } else {
+            totalScore += event.getScore();
+        }
         updateLabels();
     }
 }

@@ -59,33 +59,20 @@ public class GameKeyListener implements KeyListener {
     }
 
     private Thread doMove(final Grid.Move move) {
+        GameKeyListener self = this;
         return new Thread(() -> {
-//            Thread t  = new Thread() {
-//                @Override
-//                public void run() {
-//                    do {
-//                        canvas.repaint();
-//                        AnimationManager.safeSleep(MOVE_DELAY);
-//                    } while(grid.isPacking());
-//                    canvas.repaint();
-//                }
-//            };
-//            t.start();
-
-            SoundPlayer.playSound(SoundPlayer.Type.CLICK);
-            if(grid.pack(move, MOVE_DELAY)) {
-                System.out.println("Moving " + move + " free: " + grid.freeCells());
-                SoundPlayer.playSound(SoundPlayer.Type.MOVE);
-                AnimationManager.safeSleep(MOVE_DELAY);
-                grid.addRandomValue();
-//                canvas.repaint();
-            } else {
-                SoundPlayer.playSound(SoundPlayer.Type.ILLEGAL);
-                System.out.println("Illegal action - " + move);
+            synchronized (self) {
+                SoundPlayer.playSound(SoundPlayer.Type.CLICK);
+                if(grid.pack(move, MOVE_DELAY)) {
+                    SoundPlayer.playSound(SoundPlayer.Type.MOVE);
+                    AnimationManager.safeSleep(MOVE_DELAY);
+                    grid.addRandomValue();
+                } else {
+                    SoundPlayer.playSound(SoundPlayer.Type.ILLEGAL);
+                    System.out.println("Illegal action - " + move);
+                    verifyGameOver();
+                }
             }
-
-            verifyGameOver();
-
         });
     }
 

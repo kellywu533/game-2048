@@ -5,23 +5,12 @@ import java.util.Random;
 
 public class Grid {
     public enum Move {
-        UP(true)
-        , DOWN(true)
-        , LEFT(false)
-        , RIGHT(false)
-        ;
-
-        boolean isVertical;
-        Move(boolean isVertical) {
-            this.isVertical = isVertical;
-        }
-
-        public boolean isVertical() {
-            return isVertical;
-        }
+        UP
+        , DOWN
+        , LEFT
+        , RIGHT
     }
 
-    private static GameTile[] gameTiles = new GameTile[17];
     private int[] cellValues;
     private int rows;
     private int columns;
@@ -41,7 +30,8 @@ public class Grid {
         this.listeners.add(listener);
     }
 
-    private void publishEvent(GridEvent event) {
+    private void publishEvent(int score) {
+        GridEvent event = new GridEvent(score);
         for(GridEventListener l : listeners) {
             l.update(event);
         }
@@ -55,9 +45,10 @@ public class Grid {
         addRandomValue();
 
         gameOver = false;
+        publishEvent(-1);
     }
 
-    public boolean checkGameOver() {
+    public synchronized boolean checkGameOver() {
         if (gameOver) {
             return true;
         }
@@ -131,7 +122,7 @@ public class Grid {
         }
     }
 
-    public void addRandomValue() {
+    public synchronized void addRandomValue() {
         ArrayList<Integer> values = new ArrayList<>();
         for(int i = 0; i < cellValues.length; i++) {
             if(valueAt(i) == 0) {
@@ -140,24 +131,12 @@ public class Grid {
         }
 
         if(values.isEmpty()) {
-            System.out.println("Game over :(");
-            gameOver = true;
             return;
         }
 
         int position = values.get(random.nextInt(values.size()));
         putValue(position, startingNumber());
-        publishEvent(new GridEvent(0));
-    }
-
-    public int freeCells() {
-        int cnt = 0;
-        for (int i = 0; i < cellValues.length; i++) {
-            if (valueAt(i) == 0) {
-                cnt ++;
-            }
-        }
-        return cnt;
+        publishEvent(0);
     }
 
     /**
@@ -262,84 +241,31 @@ public class Grid {
         return score;
     }
 
-    boolean packX(Move move) {
-        boolean changed = false;
-        for (int r = 0; r < rows; r++) {
-            for (int c = 0; c < columns; c++) {
-                int v = valueAt(r, c);
-                int nx;
-                switch (move) {
-                    case UP:
-                        nx = r + 1;
-                        if (nx < rows && v == valueAt(nx, c)) {
-                            putValue(r, c, v * 2);
-                            putValue(nx, c, 0);
-                            changed = true;
-                        }
-                        break;
-                    case LEFT:
-                        nx = c + 1;
-                        if (nx < columns && v == valueAt(r, nx)) {
-                            putValue(r, c, v * 2);
-                            putValue(r, nx, 0);
-                            changed = true;
-                        }
-                        break;
-                }
-            }
-        }
-        for (int r = rows - 1; r >= 0; r--) {
-            for (int c = columns - 1; c >= 0; c--) {
-                int v = valueAt(r, c);
-                int nx;
-                switch (move) {
-                    case DOWN:
-                        nx = r - 1;
-                        if (nx >= 0 && v == valueAt(nx, c)) {
-                            putValue(r, c, v * 2);
-                            putValue(nx, c, 0);
-                            changed = true;
-                        }
-                        break;
-                    case RIGHT:
-                        nx = c - 1;
-                        if (nx >= 0 && v == valueAt(r, nx)) {
-                            putValue(r, c, v * 2);
-                            putValue(r, nx, 0);
-                            changed = true;
-                        }
-                        break;
-                }
-            }
-        }
-        return changed;
-    }
-
     /**
      * Returns if anything thing was moved at all
      * @param move - direction of movement
      * @return boolean - true if the grid was changed
      */
-    public boolean pack(Move move, long delay) {
+    public synchronized boolean pack(Move move, long delay) {
         this.packing = true;
         boolean changed = false;
 
         while(pack0(move)) {
             changed = true;
-            publishEvent(new GridEvent(0));
+            publishEvent(0);
             AnimationManager.safeSleep(delay);
         }
 
         int score;
         if ((score = packX2(move)) > 0) {
             changed = true;
-            publishEvent(new GridEvent(score));
+            publishEvent(score);
             AnimationManager.safeSleep(delay);
         }
 
         while(pack0(move)) {
             changed = true;
-            publishEvent(new GridEvent(0));
+            publishEvent(0);
             AnimationManager.safeSleep(delay);
         }
 
