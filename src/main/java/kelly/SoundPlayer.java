@@ -23,11 +23,14 @@ public class SoundPlayer {
                 Path path = Paths.get(AUDIO_DIR, fname);
                 soundData = Files.readAllBytes(path);
             } catch (IOException e) {
-                e.printStackTrace();
+                System.out.println("unable to load sound clip " + fname);
             }
         }
 
         public InputStream soundDataInputStream() {
+            if(soundData == null) {
+                return null;
+            }
             return new ByteArrayInputStream(soundData);
         }
     }
@@ -68,6 +71,10 @@ public class SoundPlayer {
     }
 
     public static void playSound(Type t) {
+        if(t.soundDataInputStream() == null) {
+            System.out.println("no sound " + t);
+            return;
+        }
         playSound(t.soundDataInputStream());
     }
 
