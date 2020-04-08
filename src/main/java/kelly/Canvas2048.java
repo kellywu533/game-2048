@@ -15,8 +15,13 @@ public class Canvas2048 extends Canvas implements GridEventListener {
         this.gameTiles = GameTile.gameTiles();
     }
 
+    private boolean eraseBackground = false;
+
     @Override
     public void update(GridEvent event) {
+        if(event.getScore() < 0) {
+            eraseBackground = true;
+        }
         this.repaint();
     }
 
@@ -51,6 +56,16 @@ public class Canvas2048 extends Canvas implements GridEventListener {
         fw = fm.stringWidth(text);
         fh = fm.getHeight();
         g.drawString(text, (getWidth() - fw)/2, getHeight()/2 + fh/3);
+    }
+
+    @Override
+    public void update(Graphics g) {
+        if(eraseBackground) {
+            eraseBackground = false;
+            super.update(g);
+        } else {
+            paint(g);
+        }
     }
 
     @Override

@@ -24,8 +24,9 @@ public class App
         ScorePane sf = new ScorePane();
         grid.addListener(sf);
 
-        GameKeyListener gkl = new GameKeyListener(grid, c);
+        GameKeyListener gkl = new GameKeyListener(grid);
         c.addKeyListener(gkl);
+        jf.addKeyListener(gkl);
 
         jf.getContentPane().setLayout(new BorderLayout());
         jf.add(c, BorderLayout.CENTER);

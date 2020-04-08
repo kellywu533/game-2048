@@ -5,12 +5,10 @@ import java.awt.event.KeyListener;
 
 public class GameKeyListener implements KeyListener {
     private Grid grid;
-    private Canvas2048 canvas;
     private static final long MOVE_DELAY = 20;
 
-    public GameKeyListener(Grid grid, Canvas2048 canvas) {
+    public GameKeyListener(Grid grid) {
         this.grid = grid;
-        this.canvas = canvas;
     }
 
     @Override
@@ -44,7 +42,10 @@ public class GameKeyListener implements KeyListener {
             case KeyEvent.VK_R:
                 System.out.println("Restarting Game");
                 grid.reset();
-                canvas.repaint();
+                return;
+            case KeyEvent.VK_T:
+                System.out.println("Test Tiles");
+                grid.preFill1();
                 break;
         }
 

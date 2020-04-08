@@ -48,6 +48,17 @@ public class Grid {
         publishEvent(-1);
     }
 
+    public void preFill1() {
+        cellValues = new int[] {
+            12, 13, 14, 15
+            , 11, 10, 9, 8
+            , 4, 5, 6, 7
+            , 3, 2, 1, 1
+        };
+        gameOver = false;
+        publishEvent(-1);
+    }
+
     public synchronized boolean checkGameOver() {
         if (gameOver) {
             return true;
