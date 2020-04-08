@@ -30,6 +30,7 @@ public class App
         jf.getContentPane().setLayout(new BorderLayout());
         jf.add(c, BorderLayout.CENTER);
         jf.add(sf, BorderLayout.NORTH);
+        jf.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
         jf.pack();
         jf.setVisible(true);
