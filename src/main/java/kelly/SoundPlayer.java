@@ -38,21 +38,21 @@ public class SoundPlayer {
             clip.addLineListener((event) -> {
                     LineEvent.Type type = event.getType();
                     if (type == LineEvent.Type.OPEN) {
-                        System.out.println("OPEN :"
-//                                + clip + " - " + ais
-                        );
+//                        System.out.println("OPEN :"
+////                                + clip + " - " + ais
+//                        );
                     } else if (type == LineEvent.Type.CLOSE) {
-                        System.out.println("CLOSE:"
-//                                + clip + " - " + ais
-                        );
+//                        System.out.println("CLOSE:"
+////                                + clip + " - " + ais
+//                        );
                     } else if (type == LineEvent.Type.START) {
-                        System.out.println("START:"
-//                                + clip + " - " + ais
-                        );
+//                        System.out.println("START:"
+////                                + clip + " - " + ais
+//                        );
                     } else if (type == LineEvent.Type.STOP) {
-                        System.out.println("STOP :"
-//                                + clip + " - " + ais
-                        );
+//                        System.out.println("STOP :"
+////                                + clip + " - " + ais
+//                        );
                         clip.close();
                     }
             });

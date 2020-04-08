@@ -21,8 +21,7 @@ public class GameTile {
             , new Color(255, 204, 255)
             , new Color(255, 204, 229)
             , new Color(255, 153, 204)
-            , new Color(255, 153, 204)
-            , new Color(255, 102, 255)
+            , new Color(255, 153, 255)
             , new Color(102, 102, 255)
     };
     private int num;
@@ -63,10 +62,9 @@ public class GameTile {
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints. VALUE_ANTIALIAS_ON);
                 g2d.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_NORMALIZE);
 
-                int fontSize = num < 100 ? 36
-                        : num < 1000 ? 32
-                        : num < 1000 ? 24
-                        : 18;
+                int fontSize = num < 1000 ? 38
+                        : num < 10000 ? 36
+                        : 32;
                 Font font = new Font(fontName, Font.BOLD, fontSize);
                 g.setFont(font);
                 String text = Integer.toString(num);
