@@ -11,6 +11,9 @@ public class ScorePane extends JPanel implements GridEventListener {
     public ScorePane() {
         scoreLabel = new JLabel();
         scoreText = new JLabel();
+        Font font = new Font("Arial", Font.PLAIN, 24);
+        scoreText.setFont(font);
+        scoreLabel.setFont(font);
         this.setLayout(new FlowLayout());
 
         this.add(scoreLabel);
