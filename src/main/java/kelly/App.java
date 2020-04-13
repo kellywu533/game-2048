@@ -34,6 +34,7 @@ public class App
         jf.add(c, BorderLayout.CENTER);
         jf.add(sf, BorderLayout.NORTH);
         jf.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        jf.setResizable(false);
 
         jf.pack();
         jf.setVisible(true);
