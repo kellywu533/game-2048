@@ -1,7 +1,5 @@
 package kelly;
 
-import org.apache.log4j.Logger;
-
 import javax.sound.sampled.*;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -11,7 +9,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class SoundPlayer {
-    private static final Logger logger = Logger.getLogger(SoundPlayer.class);
     private static final String AUDIO_DIR = "/System/Library/Sounds/";
     public enum Type {
         MOVE("Ping.aiff")
@@ -75,7 +72,7 @@ public class SoundPlayer {
 
     public static void playSound(Type t) {
         if(t.soundDataInputStream() == null) {
-            logger.info("no sound " + t);
+            System.out.println("no sound " + t);
             return;
         }
         playSound(t.soundDataInputStream());
