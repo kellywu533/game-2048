@@ -55,20 +55,16 @@ public class GameTile {
      * draws a tile with its given color and number
      * @param scale the width and height of the tile
      * @param offset the space between the tile and the grid
-     * @param background the background color of the game board
      * @param fontName the font of the tile number
      * @return the image of the tile
      */
-    public BufferedImage drawTile(int scale, int offset, Color background, String fontName) {
+    public BufferedImage drawTile(int scale, int offset, String fontName) {
         if(tileImage == null) {
             int length = scale - offset * 2;
 
-            tileImage = new BufferedImage(length, length, BufferedImage.TYPE_INT_RGB);
+            tileImage = new BufferedImage(length, length, BufferedImage.TYPE_INT_ARGB);
 
             Graphics g = tileImage.getGraphics();
-            g.setColor(background);
-
-            g.fillRect(0,0, length, length);
 
             g.setColor(getColor());
 

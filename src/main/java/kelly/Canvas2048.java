@@ -61,7 +61,7 @@ public class Canvas2048 extends Canvas implements GridEventListener {
         int x = col * scale + OFFSET;
         int y = row * scale + OFFSET;
         GameTile t = gameTiles[val];
-        g.drawImage(t.drawTile(scale, OFFSET, getBackground(), FONT_NAME), x, y,this);
+        g.drawImage(t.drawTile(scale, OFFSET, FONT_NAME), x, y,this);
     }
 
     /**
