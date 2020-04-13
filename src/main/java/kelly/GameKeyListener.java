@@ -3,9 +3,11 @@ package kelly;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
+/**
+ * triggers the board movement with each key input
+ */
 public class GameKeyListener implements KeyListener {
     private Grid grid;
-    private static final long MOVE_DELAY = 20;
 
     public GameKeyListener(Grid grid) {
         this.grid = grid;
@@ -19,8 +21,13 @@ public class GameKeyListener implements KeyListener {
     public void keyPressed(KeyEvent e) {
     }
 
+    /**
+     * overrides the key released method to move the board according to the key released
+     * @param e key event
+     */
     @Override
     public void keyReleased(KeyEvent e) {
+        //if the grid is mid-movement, the event is ignored
         if (grid.isPacking()) {
             return;
         }
@@ -49,42 +56,15 @@ public class GameKeyListener implements KeyListener {
                 break;
         }
 
-        if (verifyGameOver()) {
+        //if the game is over, the key input is ignored
+        if (grid.verifyGameOver()) {
             return;
         }
 
+        //if the move can be done, a thread is created to move the board
         if (move != null) {
-            Thread t = doMove(move);
+            Thread t = grid.createMoveThread(move);
             t.start();
         }
-    }
-
-    private Thread doMove(final Grid.Move move) {
-        GameKeyListener self = this;
-        return new Thread(() -> {
-            synchronized (self) {
-                SoundPlayer.playSound(SoundPlayer.Type.CLICK);
-                if(grid.pack(move, MOVE_DELAY)) {
-                    SoundPlayer.playSound(SoundPlayer.Type.MOVE);
-                    AnimationManager.safeSleep(MOVE_DELAY);
-                    grid.addRandomValue();
-                } else {
-                    SoundPlayer.playSound(SoundPlayer.Type.ILLEGAL);
-                    System.out.println("Illegal action - " + move);
-                    verifyGameOver();
-                }
-            }
-        });
-    }
-
-    private boolean verifyGameOver() {
-        if (grid.checkGameOver()) {
-            System.out.println("Game Over!");
-            SoundPlayer.playSound(SoundPlayer.Type.GAME_OVER);
-            return true;
-        }
-
-        return false;
-
     }
 }

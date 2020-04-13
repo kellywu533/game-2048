@@ -3,7 +3,13 @@ package kelly;
 import java.util.ArrayList;
 import java.util.Random;
 
+/**
+ * holds the value of each tile
+ */
 public class Grid {
+    /**
+     * represents the direction of movement
+     */
     public enum Move {
         UP
         , DOWN
@@ -18,7 +24,13 @@ public class Grid {
     private boolean packing = false;
     private final Random random = new Random();
     private ArrayList<GridEventListener> listeners;
+    private static final long MOVE_DELAY = 20;
 
+    /**
+     * constructs a grid with the given value of rows and columns
+     * @param rows in the grid
+     * @param columns in the grid
+     */
     public Grid(int rows, int columns) {
         this.listeners = new ArrayList<>();
         this.rows = rows;
@@ -26,10 +38,18 @@ public class Grid {
         reset();
     }
 
+    /**
+     * registers the grid event listener to receive any grid events
+     * @param listener grid event listener
+     */
     public void addListener(GridEventListener listener) {
         this.listeners.add(listener);
     }
 
+    /**
+     * publishes the event to the listeners
+     * @param score result of this movement event
+     */
     private void publishEvent(int score) {
         GridEvent event = new GridEvent(score);
         for(GridEventListener l : listeners) {
@@ -37,17 +57,22 @@ public class Grid {
         }
     }
 
+    /**
+     * resets the board for a new game
+     */
     public void reset() {
         int cells = rows*columns;
         this.cellValues = new int[cells];
 
-        addRandomValue();
-        addRandomValue();
+        addRandomTile();
+        addRandomTile();
 
         gameOver = false;
+        //publishes -1 to tell the listener to reset the game
         publishEvent(-1);
     }
 
+    //hack
     public void preFill1() {
         cellValues = new int[] {
             12, 13, 14, 15
@@ -59,11 +84,16 @@ public class Grid {
         publishEvent(-1);
     }
 
+    /**
+     * checks if the game is over
+     * @return boolean if the game is over
+     */
     public synchronized boolean checkGameOver() {
         if (gameOver) {
             return true;
         }
 
+        //loops through the rows and columns to check if adjacent values can be combined
         for(int r = 0; r < rows; r++) {
             for(int c = 0; c < columns; c++) {
                 int curr = valueAt(r, c);
@@ -92,6 +122,10 @@ public class Grid {
         return true;
     }
 
+    /**
+     * returns if the grid is moving
+     * @return boolean if movement is happening
+     */
     public boolean isPacking() {
         return packing;
     }
@@ -104,28 +138,57 @@ public class Grid {
         return columns;
     }
 
+    /**
+     * returns the value of a tile at the given row and column
+     * @param row of the tile
+     * @param column of the tile
+     * @return the integer value of the tile
+     */
     public int valueAt(int row, int column) {
         return valueAt(row * columns + column);
     }
 
+    /**
+     * returns the translated tile at the index
+     */
     private int valueAt(int idx) {
         return cellValues[idx];
     }
 
+    /**
+     * puts a tile value into the grid
+     * @param idx index position
+     * @param val value of the tile
+     */
     void putValue(int idx, int val) {
         cellValues[idx] = val;
     }
 
+    /**
+     * puts the desired value of a tile at the row and column provided
+     * @param row of the tile
+     * @param column of the tile
+     * @param value of the tile
+     */
     private void putValue(int row, int column, int value) {
         cellValues[row * columns + column] = value;
     }
 
+    /**
+     * returns the internal representation of all tiles for test purposes only
+     * @return the values of the tiles
+     */
     int[] getValues() {
         return cellValues;
     }
 
+    /**
+     * returns a random generated number for the new tiles
+     * @return randomly generated number, either one or two
+     */
     private int startingNumber() {
         float numb = random.nextFloat();
+        // percentage of numbers generated
         if(numb < 0.85) {
             return 1;
         } else {
@@ -133,7 +196,10 @@ public class Grid {
         }
     }
 
-    public synchronized void addRandomValue() {
+    /**
+     * adds a random new tile to the grid
+     */
+    public synchronized void addRandomTile() {
         ArrayList<Integer> values = new ArrayList<>();
         for(int i = 0; i < cellValues.length; i++) {
             if(valueAt(i) == 0) {
@@ -147,13 +213,14 @@ public class Grid {
 
         int position = values.get(random.nextInt(values.size()));
         putValue(position, startingNumber());
+        // send a message to redraw the board
         publishEvent(0);
     }
 
     /**
-     * Packs the values with the given Move direction to eliminate spaces
-     * @param move - the direction of movement
-     * @return boolean - true if any cell value has changed
+     * packs the values with the given Move direction to eliminate spaces
+     * @param move the direction of movement
+     * @return boolean true if any cell value has changed
      */
     boolean pack0(Move move) {
         boolean changed = false;
@@ -203,6 +270,11 @@ public class Grid {
         return changed;
     }
 
+    /**
+     * merges the tiles with the same value
+     * @param move
+     * @return
+     */
     int packX2(Move move) {
         int score = 0;
         for (int r = 0; r < rows; r++) {
@@ -253,20 +325,22 @@ public class Grid {
     }
 
     /**
-     * Returns if anything thing was moved at all
-     * @param move - direction of movement
-     * @return boolean - true if the grid was changed
+     * returns if anything thing was moved at all
+     * @param move direction of movement
+     * @return boolean true if the grid was changed
      */
     public synchronized boolean pack(Move move, long delay) {
         this.packing = true;
         boolean changed = false;
 
+        //keeps packing the empty spaces until there are no more gaps
         while(pack0(move)) {
             changed = true;
             publishEvent(0);
             AnimationManager.safeSleep(delay);
         }
 
+        //merges the same, adjacent tiles and publishes the score
         int score;
         if ((score = packX2(move)) > 0) {
             changed = true;
@@ -274,6 +348,7 @@ public class Grid {
             AnimationManager.safeSleep(delay);
         }
 
+        //packs again with the new spaces generated after merging has happened
         while(pack0(move)) {
             changed = true;
             publishEvent(0);
@@ -284,4 +359,43 @@ public class Grid {
         return changed;
     }
 
+    /**
+     * checks if the boolean game over is true and plays the game over sound accordingly
+     * @return if the game is over
+     */
+    public boolean verifyGameOver() {
+        if (gameOver) {
+            System.out.println("Game Over!");
+            SoundPlayer.playSound(SoundPlayer.Type.GAME_OVER);
+            return true;
+        }
+
+        return false;
+    }
+
+    private Object lock = new Object();
+
+    /**
+     * returns a thread that moves the board according to the move value
+     * the thread will pack, play the corresponding sound effect, then sleep before adding a new tile if there
+     * is space for a new tile
+     * @param move direction of movement
+     * @return thread to do the move action
+     */
+    public Thread createMoveThread(final Grid.Move move) {
+        return new Thread(() -> {
+            synchronized (lock) {
+                SoundPlayer.playSound(SoundPlayer.Type.CLICK);
+                if(pack(move, MOVE_DELAY)) {
+                    SoundPlayer.playSound(SoundPlayer.Type.MOVE);
+                    AnimationManager.safeSleep(MOVE_DELAY);
+                    addRandomTile();
+                } else {
+                    SoundPlayer.playSound(SoundPlayer.Type.ILLEGAL);
+                    System.out.println("Illegal action - " + move);
+                    verifyGameOver();
+                }
+            }
+        });
+    }
 }

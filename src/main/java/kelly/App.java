@@ -4,8 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * Hello world!
- *
+ * main class to set up the board and display it on the screen
  */
 public class App 
 {
@@ -19,12 +18,15 @@ public class App
         Grid grid = new Grid(HEIGHT, WIDTH);
 
         Canvas2048 c = new Canvas2048(grid, SCALE);
+        //registered with the grid to receive messages about movements to redraw the board
         grid.addListener(c);
 
         ScorePane sf = new ScorePane();
+        //registered with the grid to receive messages to update the score
         grid.addListener(sf);
 
         GameKeyListener gkl = new GameKeyListener(grid);
+        //added the game key listener to the canvas and jframe to manage the keyboard input
         c.addKeyListener(gkl);
         jf.addKeyListener(gkl);
 
