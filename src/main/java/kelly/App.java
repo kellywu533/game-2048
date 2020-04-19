@@ -20,6 +20,7 @@ public class App
         Canvas2048 c = new Canvas2048(grid, SCALE);
         //registered with the grid to receive messages about movements to redraw the board
         grid.addListener(c);
+        grid.setMoveDelay(20);
 
         ScorePane sf = new ScorePane();
         //registered with the grid to receive messages to update the score

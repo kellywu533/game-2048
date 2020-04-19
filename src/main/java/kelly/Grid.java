@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 /**
- * holds the value of each tile
+ * holds the value of each tile and moves the tiles
  */
 public class Grid {
     /**
@@ -24,7 +24,7 @@ public class Grid {
     private boolean packing = false;
     private final Random random = new Random();
     private ArrayList<GridEventListener> listeners;
-    private static final long MOVE_DELAY = 20;
+    private long moveDelay = 60;
 
     /**
      * constructs a grid with the given value of rows and columns
@@ -36,6 +36,10 @@ public class Grid {
         this.rows = rows;
         this.columns = columns;
         reset();
+    }
+
+    public void setMoveDelay(long moveDelay) {
+        this.moveDelay = moveDelay;
     }
 
     /**
@@ -197,7 +201,7 @@ public class Grid {
     }
 
     /**
-     * adds a random new tile to the grid
+     * adds a random new tile to the grid at an open space
      */
     public synchronized void addRandomTile() {
         ArrayList<Integer> values = new ArrayList<>();
@@ -271,7 +275,7 @@ public class Grid {
     }
 
     /**
-     * merges the tiles with the same value
+     * merges the adjacent tiles with the same value
      * @param move
      * @return
      */
@@ -285,7 +289,7 @@ public class Grid {
                     case UP:
                         v = valueAt(r, c);
                         nx = r + 1;
-                        if (nx < rows && v == valueAt(nx, c) && v != 0) {
+                        if (v != 0 && nx < rows && v == valueAt(nx, c)) {
                             putValue(r, c, ++v);
                             putValue(nx, c, 0);
                             score = score + (int)Math.pow(2,v);
@@ -294,7 +298,7 @@ public class Grid {
                     case LEFT:
                         v = valueAt(r, c);
                         nx = c + 1;
-                        if (nx < columns && v == valueAt(r, nx) && v != 0) {
+                        if (v != 0 && nx < columns && v == valueAt(r, nx)) {
                             putValue(r, c, ++v);
                             putValue(r, nx, 0);
                             score = score + (int) Math.pow(2,v);
@@ -304,7 +308,7 @@ public class Grid {
                         p = rows - 1 - r;
                         v = valueAt(p, c);
                         nx = p - 1;
-                        if (nx >= 0 && v == valueAt(nx, c) && v != 0) {
+                        if (v != 0 && nx >= 0 && v == valueAt(nx, c)) {
                             putValue(p, c, ++v);
                             putValue(nx, c, 0);
                             score = score + (int) Math.pow(2,v);                        }
@@ -313,7 +317,7 @@ public class Grid {
                         p = columns - 1 - c;
                         v = valueAt(r, p);
                         nx = p - 1;
-                        if (nx >= 0 && v == valueAt(r, nx) && v != 0) {
+                        if (v != 0 && nx >= 0 && v == valueAt(r, nx)) {
                             putValue(r, p, ++v);
                             putValue(r, nx, 0);
                             score = score + (int) Math.pow(2,v);                        }
@@ -325,11 +329,11 @@ public class Grid {
     }
 
     /**
-     * returns if anything thing was moved at all
+     * moves the tiles and returns if anything thing is moved at all
      * @param move direction of movement
      * @return boolean true if the grid was changed
      */
-    public synchronized boolean pack(Move move, long delay) {
+    public synchronized boolean pack(Move move) {
         this.packing = true;
         boolean changed = false;
 
@@ -337,7 +341,7 @@ public class Grid {
         while(pack0(move)) {
             changed = true;
             publishEvent(0);
-            AnimationManager.safeSleep(delay);
+            AnimationManager.safeSleep(moveDelay);
         }
 
         //merges the same, adjacent tiles and publishes the score
@@ -345,14 +349,14 @@ public class Grid {
         if ((score = packX2(move)) > 0) {
             changed = true;
             publishEvent(score);
-            AnimationManager.safeSleep(delay);
+            AnimationManager.safeSleep(moveDelay);
         }
 
         //packs again with the new spaces generated after merging has happened
         while(pack0(move)) {
             changed = true;
             publishEvent(0);
-            AnimationManager.safeSleep(delay);
+            AnimationManager.safeSleep(moveDelay);
         }
 
         this.packing = false;
@@ -386,9 +390,9 @@ public class Grid {
         return new Thread(() -> {
             synchronized (lock) {
                 SoundPlayer.playSound(SoundPlayer.Type.CLICK);
-                if(pack(move, MOVE_DELAY)) {
+                if(pack(move)) {
                     SoundPlayer.playSound(SoundPlayer.Type.MOVE);
-                    AnimationManager.safeSleep(MOVE_DELAY);
+                    AnimationManager.safeSleep(moveDelay);
                     addRandomTile();
                 } else {
                     SoundPlayer.playSound(SoundPlayer.Type.ILLEGAL);
