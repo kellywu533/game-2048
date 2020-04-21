@@ -228,46 +228,51 @@ public class Grid {
      */
     boolean pack0(Move move) {
         boolean changed = false;
-        for (int r = 0; r < rows; r++) {
-            for (int c = 0; c < columns; c++) {
-                int v = valueAt(r, c);
-                if (v != 0) {
-                    continue;
-                }
-                int nx, nv;
-                switch (move) {
+
+        for(int r = 0; r < rows; r++) {
+            for(int c = 0; c < columns; c++) {
+                int nx, vx;
+
+                switch(move) {
                     case UP:
-                        nx = r + 1;
-                        if (nx < rows && (nv = valueAt(nx, c)) != 0) {
-                            putValue(r, c, nv);
-                            putValue(nx, c, 0);
-                            changed = true;
-                        }
-                        break;
-                    case DOWN:
-                        nx = r - 1;
-                        if (nx >= 0 && (nv = valueAt(nx, c)) != 0) {
-                            putValue(r, c, nv);
-                            putValue(nx , c, 0);
-                            changed = true;
+                        if(valueAt(r, c) == 0) {
+                            nx = r + 1;
+                            if(nx < rows && (vx = valueAt(nx, c)) > 0) {
+                                putValue(r, c, vx);
+                                putValue(nx, c, 0);
+                                changed = true;
+                            }
                         }
                         break;
                     case LEFT:
-                        nx = c + 1;
-                        if (nx < columns && (nv = valueAt(r, nx)) != 0) {
-                            putValue(r, c, nv);
-                            putValue(r, nx, 0);
-                            changed = true;
+                        if(valueAt(r, c) == 0) {
+                            nx = c + 1;
+                            if(nx < columns && (vx = valueAt(r, nx)) > 0) {
+                                putValue(r, c, vx);
+                                putValue(r, nx, 0);
+                                changed = true;
+                            }
+                        }
+                        break;
+                    case DOWN:
+                        if(valueAt(rows - 1 - r, c) == 0) {
+                            nx = rows - 2 - r;
+                            if(nx >= 0 && (vx = valueAt(nx, c)) > 0) {
+                                putValue(rows - 1 - r, c, vx);
+                                putValue(nx, c, 0);
+                                changed = true;
+                            }
                         }
                         break;
                     case RIGHT:
-                        nx = c - 1;
-                        if (nx >= 0 && (nv = valueAt(r, nx)) != 0) {
-                            putValue(r, c, nv);
-                            putValue(r, nx, 0);
-                            changed = true;
+                        if(valueAt(r, columns - 1 - c) == 0) {
+                            nx = columns - 2 - c;
+                            if(nx >= 0 && (vx = valueAt(r, nx)) > 0) {
+                                putValue(r, columns - 1 - c, vx);
+                                putValue(r, nx, 0);
+                                changed = true;
+                            }
                         }
-                        break;
                 }
             }
         }

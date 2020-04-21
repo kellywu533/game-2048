@@ -36,7 +36,9 @@ public class Canvas2048 extends Canvas implements GridEventListener {
         if(event.getScore() < 0) {
             eraseBackground = true;
         }
-        this.repaint();
+        // multiple repaint requests are ignored -> force update
+//        this.repaint();
+        this.update(this.getGraphics());
     }
 
     /**

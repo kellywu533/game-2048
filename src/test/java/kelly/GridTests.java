@@ -33,25 +33,82 @@ public class GridTests {
         }, g.getValues());
     }
 
-    @Ignore
-    //TODO fix pack0 method
     @Test
     public void testPack0() {
         setupGrid(
-                new int[] {
-                        0, 2, 0, 8
-                        , 2, 0, 0, 0
-                        , 2, 0, 2, 0
-                        , 0, 2, 0, 0
-                }
+            new int[] {
+                0, 2, 0, 8
+                , 2, 0, 0, 0
+                , 2, 0, 2, 0
+                , 0, 2, 0, 0
+            }
         );
 
-        Assert.assertTrue(g.pack0(Grid.Move.RIGHT));
-        Assert.assertArrayEquals(new int[] {
+        Grid.Move m = Grid.Move.RIGHT;
+        Assert.assertTrue(g.pack0(m));
+        Assert.assertArrayEquals("test " + m,
+            new int[] {
                 0, 0, 2, 8
                 , 0, 2, 0, 0
                 , 0, 2, 0, 2
                 , 0, 0, 2, 0
         }, g.getValues());
+
+        setupGrid(
+            new int[] {
+                2, 2, 0, 8
+                , 0, 0, 0, 2
+                , 2, 0, 2, 2
+                , 0, 0, 0, 0
+            }
+        );
+
+        m = Grid.Move.DOWN;
+        Assert.assertTrue(g.pack0(m));
+        Assert.assertArrayEquals("test " + m,
+            new int[] {
+                0, 0, 0, 0
+                , 2, 2, 0, 8
+                , 0, 0, 0, 2
+                , 2, 0, 2, 2
+            }, g.getValues());
+
+        setupGrid(
+            new int[] {
+                0, 2, 0, 8
+                , 0, 0, 0, 2
+                , 0, 2, 0, 0
+                , 2, 2, 0, 0
+            }
+        );
+
+        m = Grid.Move.LEFT;
+        Assert.assertTrue(g.pack0(m));
+        Assert.assertArrayEquals("test " + m,
+            new int[] {
+                2, 0, 8, 0
+                , 0, 0, 2, 0
+                , 2, 0, 0, 0
+                , 2, 2, 0, 0
+            }, g.getValues());
+
+        setupGrid(
+            new int[] {
+                0, 2, 0, 8
+                , 2, 0, 0, 0
+                , 2, 0, 2, 0
+                , 0, 2, 0, 2
+            }
+        );
+
+        m = Grid.Move.UP;
+        Assert.assertTrue(g.pack0(m));
+        Assert.assertArrayEquals("test " + m,
+            new int[] {
+                2, 2, 0, 8
+                , 2, 0, 2, 0
+                , 0, 2, 0, 2
+                , 0, 0, 0, 0
+            }, g.getValues());
     }
 }
